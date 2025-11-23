@@ -3,7 +3,7 @@
 
 """
 Ultra addictive 3Commas referral Telegram bot
-Python + python-telegram-bot v20+
+Python + python-telegram-bot v21.7 (uyumlu hale getirildi)
 """
 
 import logging
@@ -24,7 +24,8 @@ from telegram.ext import (
 
 # ================== AYARLAR ==================
 
-BOT_TOKEN = "8221656662:AAH0e1HsoJE8wP_lR7278R-I-2jUHas2wK4"   # <-- buraya kendi tokenını yaz
+# BURAYA YENİ TOKENİNİ KOYACAKSIN
+BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
 
 BANNER_URL = "https://i.imgur.com/3xY7k9P.jpg"   # banner veya GIF
 
@@ -32,7 +33,7 @@ REF_LINK = "https://3commas.io/?ref=PUT_YOUR_REF_CODE_HERE"   # referral linkin
 
 HOW_IT_WORKS_VIDEO_URL = "https://www.youtube.com/watch?v=PUT_VIDEO_ID_HERE"  # video link
 
-WINNERS_UPDATE_LIMIT = 20   # kazanan listesi kaç kez yenilenecek (her 15 sn)
+WINNERS_UPDATE_LIMIT = 20   # şimdilik işlevsel değil ama dursun
 
 
 # ================== LOGGING ==================
@@ -115,9 +116,9 @@ async def send_main_banner(chat_id: int, context: ContextTypes.DEFAULT_TYPE):
     """
     caption = (
         "🚀 *The Secret Bot That Changes Trading Forever*\n\n"
-        "🔥 Only **100 slots left** to claim a *FREE 1-Year 3Commas Pro account!*\n"
+        "🔥 Only *100 slots left* to claim a FREE 1-Year 3Commas Pro account!\n"
         "⏳ Claim yours before it closes!\n\n"
-        "💰 Users reported earning over **$47,000 in 2 weeks** using this setup."
+        "💰 Users reported earning over *$47,000 in 2 weeks* using this setup."
     )
 
     await context.bot.send_photo(
@@ -158,8 +159,8 @@ async def get_ref_link_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 
     msg = (
         "🎉 Congratulations!\n\n"
-        "Your exclusive **3Commas Pro Referral Link** has been generated.\n"
-        "Click the button below to activate your **FREE 1-Year Pro plan**:"
+        "Your exclusive 3Commas Pro Referral Link has been generated.\n"
+        "Click the button below to activate your FREE 1-Year Pro plan:"
     )
 
     keyboard = InlineKeyboardMarkup([
@@ -170,48 +171,55 @@ async def get_ref_link_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         await context.bot.send_message(
             chat_id=user.id,
             text=msg,
-            parse_mode="Markdown",
             reply_markup=keyboard,
         )
 
         await query.message.reply_text(
             "✅ I've sent your private activation link via DM — check your Telegram inbox!"
         )
-    except:
+    except Exception:
         await query.message.reply_text(
-            "⚠️ I couldn't DM you. Please open a private chat with me first and press the button again."
+            "⚠️ I couldn't DM you. Please open a private chat with me first and press the button again.\n\n"
+            "Here is your link anyway:",
+            reply_markup=keyboard,
         )
 
 
 async def show_winners_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Kazanan listesi ekranı.
-    Sonrasında JobQueue ile her 15 saniye güncellenir.
+    (JobQueue zorunlu olmadığı için, sadece tek seferlik liste gösteriyoruz.
+     JobQueue yoksa hata vermesin diye korumaya aldım.)
     """
     query = update.callback_query
     await query.answer()
 
     text = build_winners_text()
-    msg = await query.message.reply_text(
+    await query.message.reply_text(
         text=text,
         parse_mode="Markdown"
     )
 
-    context.job_queue.run_repeating(
-        update_winners_job,
-        interval=15,
-        first=15,
-        data={
-            "chat_id": msg.chat_id,
-            "message_id": msg.message_id,
-            "counter": 0,
-        }
-    )
+    # Eğer ileride JobQueue eklersek (python-telegram-bot[job-queue]),
+    # aşağıdaki blok aktif edilebilir.
+    job_queue = getattr(context, "job_queue", None)
+    if job_queue is not None:
+        job_queue.run_repeating(
+            update_winners_job,
+            interval=15,
+            first=15,
+            data={
+                "chat_id": query.message.chat_id,
+                "message_id": query.message.message_id,
+                "counter": 0,
+            },
+        )
 
 
 async def update_winners_job(context: ContextTypes.DEFAULT_TYPE):
     """
     Her 15 saniyede fake kazanan listesini günceller.
+    (Şu an JobQueue zorunlu değil, yukarıda guard var.)
     """
     job = context.job
     data = job.data
@@ -229,19 +237,20 @@ async def update_winners_job(context: ContextTypes.DEFAULT_TYPE):
             text=build_winners_text(),
             parse_mode="Markdown"
         )
-    except:
+    except Exception:
         job.schedule_removal()
 
 
 async def how_it_works_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Nasıl çalışıyor metni.
+    Parse_mode kaldırıldı, Markdown parsing hatasına düşmesin.
     """
     query = update.callback_query
     await query.answer()
 
     msg = (
-        "ℹ️ *How Does It Work?*\n\n"
+        "ℹ️ How Does It Work?\n\n"
         "3Commas is an automated trading platform that executes trades for you 24/7.\n\n"
         "✅ Smart strategies\n"
         "✅ Greed-free entries\n"
@@ -249,12 +258,11 @@ async def how_it_works_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         "✅ Funds safety\n"
         "✅ No emotions\n\n"
         f"🎥 Watch the explanation video:\n{HOW_IT_WORKS_VIDEO_URL}\n\n"
-        "Click the button below to claim your **FREE 1-Year Pro account**."
+        "Click the button below to claim your FREE 1-Year Pro account."
     )
 
     await query.message.reply_text(
         text=msg,
-        parse_mode="Markdown",
         reply_markup=build_main_keyboard(),
     )
 
