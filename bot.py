@@ -25,7 +25,7 @@ from telegram.ext import (
 # ================== AYARLAR ==================
 
 # BURAYA YENİ TOKENİNİ KOYACAKSIN
-BOT_TOKEN = "8221656662:AAH0e1HsoJE8wP_lR7278R-I-2jUHas2wK4"
+BOT_TOKEN = "8221656662:AAHE-KT7Io01HN-wMizXjAemaBuT2C_mYXs"
 
 BANNER_URL = "https://i.imgur.com/3xY7k9P.jpg"   # banner veya GIF
 
