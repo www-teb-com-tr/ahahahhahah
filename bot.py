@@ -1,85 +1,281 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# (KANKA: BOT TAM BURADA)
-# This is the ultra addictive 3Commas referral Telegram bot
-# English bot + Turkish explanations
+"""
+Ultra addictive 3Commas referral Telegram bot
+Python + python-telegram-bot v20+
+"""
 
-import logging, random
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, CallbackQueryHandler, filters
+import logging
+import random
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
+from telegram.ext import (
+    ApplicationBuilder,
+    ContextTypes,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters,
+)
 
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
-BANNER_URL = "https://i.imgur.com/3xY7k9P.jpg"
-REF_LINK = "https://3commas.io/?ref=PUT_YOUR_REF_CODE_HERE"
-HOW_IT_WORKS_VIDEO_URL = "https://www.youtube.com/watch?v=PUT_VIDEO_ID_HERE"
-WINNERS_UPDATE_LIMIT = 20
+# ================== AYARLAR ==================
 
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",level=logging.INFO)
+BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"   # <-- buraya kendi tokenını yaz
+
+BANNER_URL = "https://i.imgur.com/3xY7k9P.jpg"   # banner veya GIF
+
+REF_LINK = "https://3commas.io/?ref=PUT_YOUR_REF_CODE_HERE"   # referral linkin
+
+HOW_IT_WORKS_VIDEO_URL = "https://www.youtube.com/watch?v=PUT_VIDEO_ID_HERE"  # video link
+
+WINNERS_UPDATE_LIMIT = 20   # kazanan listesi kaç kez yenilenecek (her 15 sn)
+
+
+# ================== LOGGING ==================
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 logger = logging.getLogger(__name__)
 
-def build_main_keyboard():
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎁 GET FREE 1-YEAR PRO ACCOUNT",callback_data="get_ref_link")],
-        [InlineKeyboardButton("📈 LIVE Winners",callback_data="show_winners")],
-        [InlineKeyboardButton("ℹ️ How Does It Work?",callback_data="how_it_works")]
-    ])
 
-def generate_fake_username():
-    bases=["CryptoKing","BoraTrader","AhmetBTC","AltcoinQueen","ScalperFox","LamboHunter","PumpWizard"]
-    return f"@{random.choice(bases)}{random.randint(7,99)}"
+# ================== YARDIMCI FONKSİYONLAR ==================
 
-def generate_fake_profit():
-    whole=random.randint(1500,15000)
-    dec=random.randint(100,999)
-    return f"{whole:,}".replace(",",".")+f",{dec}"
+def build_main_keyboard() -> InlineKeyboardMarkup:
+    """
+    Ana ekranda çıkacak inline butonları oluşturur.
+    """
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                text="🎁 GET FREE 1-YEAR PRO ACCOUNT",
+                callback_data="get_ref_link",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="📈 LIVE Winners",
+                callback_data="show_winners",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="ℹ️ How Does It Work?",
+                callback_data="how_it_works",
+            )
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
-def build_winners_text():
-    lines=["📈 *Live Winners Feed*",""]
-    for _ in range(random.randint(4,7)):
-        lines.append(f"✅ {generate_fake_username()} → +${generate_fake_profit()}")
+
+def generate_fake_username() -> str:
+    """
+    Fake username üretir.
+    """
+    bases = [
+        "CryptoKing", "BoraTrader", "AhmetBTC", "AltcoinQueen", "ScalperFox",
+        "LamboHunter", "PumpWizard", "SwingLord", "SniperTR", "WhaleWatcher",
+        "BotPilot", "GridMaster", "SwingAngel", "DeltaLord", "BullSniper",
+    ]
+    base = random.choice(bases)
+    suffix = random.randint(7, 99)
+    return f"@{base}{suffix}"
+
+
+def generate_fake_profit() -> str:
+    """
+    Fake kazanç miktarı üretir.
+    """
+    whole = random.randint(1500, 15000)
+    decimals = random.randint(100, 999)
+    return f"{whole:,}".replace(",", ".") + f",{decimals}"
+
+
+def build_winners_text() -> str:
+    """
+    Fake kazanan listesi paragrafını üretir.
+    """
+    lines = ["📈 *Live Winners Feed*\n"]
+    count = random.randint(4, 7)
+    for _ in range(count):
+        u = generate_fake_username()
+        p = generate_fake_profit()
+        lines.append(f"✅ {u} → +${p}")
     return "\n".join(lines)
 
-async def send_main_banner(chat_id, ctx):
-    caption=("🚀 *The Secret Bot That Changes Trading Forever*\n\n"
-             "🔥 Only **100 left** to claim FREE 1-Year 3Commas Pro!")
-    await ctx.bot.send_photo(chat_id=chat_id,photo=BANNER_URL,caption=caption,parse_mode="Markdown",reply_markup=build_main_keyboard())
 
-async def start_handler(u,ctx):await send_main_banner(u.effective_chat.id,ctx)
-async def any_message_handler(u,ctx):await send_main_banner(u.effective_chat.id,ctx)
+async def send_main_banner(chat_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Ana banner'ı + metni + butonları yollar.
+    """
+    caption = (
+        "🚀 *The Secret Bot That Changes Trading Forever*\n\n"
+        "🔥 Only **100 slots left** to claim a *FREE 1-Year 3Commas Pro account!*\n"
+        "⏳ Claim yours before it closes!\n\n"
+        "💰 Users reported earning over **$47,000 in 2 weeks** using this setup."
+    )
 
-async def get_ref_link_handler(u,ctx):
-    q=u.callback_query;await q.answer()
-    kb=InlineKeyboardMarkup([[InlineKeyboardButton("🎁 OPEN MY FREE PRO ACCOUNT",url=REF_LINK)]])
+    await context.bot.send_photo(
+        chat_id=chat_id,
+        photo=BANNER_URL,
+        caption=caption,
+        parse_mode="Markdown",
+        reply_markup=build_main_keyboard(),
+    )
+
+
+# ================== HANDLERLAR ==================
+
+async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    /start komutu gelince ana ekranı gösterir.
+    """
+    await send_main_banner(update.effective_chat.id, context)
+
+
+async def any_message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Kullanıcı herhangi bir mesaj yazarsa yine ana ekranı gösterir.
+    """
+    await send_main_banner(update.effective_chat.id, context)
+
+
+async def get_ref_link_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Kullanıcı referral butonuna basınca:
+    - DM'ye özel mesaj yollar
+    - Buton tekrar verir
+    """
+    query = update.callback_query
+    await query.answer()
+
+    user = query.from_user
+
+    msg = (
+        "🎉 Congratulations!\n\n"
+        "Your exclusive **3Commas Pro Referral Link** has been generated.\n"
+        "Click the button below to activate your **FREE 1-Year Pro plan**:"
+    )
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🎁 OPEN MY FREE PRO ACCOUNT", url=REF_LINK)]
+    ])
+
     try:
-        await ctx.bot.send_message(chat_id=u.effective_user.id,text="Your link:",reply_markup=kb)
-        await q.message.reply_text("DM sent!")
-    except:await q.message.reply_text("DM closed. Open DM first.")
+        await context.bot.send_message(
+            chat_id=user.id,
+            text=msg,
+            parse_mode="Markdown",
+            reply_markup=keyboard,
+        )
 
-async def show_winners_handler(u,ctx):
-    q=u.callback_query;await q.answer()
-    m=await q.message.reply_text(build_winners_text(),parse_mode="Markdown")
-    ctx.job_queue.run_repeating(update_winners_job,15,15,data={"chat":m.chat_id,"msg":m.message_id,"c":0})
+        await query.message.reply_text(
+            "✅ I've sent your private activation link via DM — check your Telegram inbox!"
+        )
+    except:
+        await query.message.reply_text(
+            "⚠️ I couldn't DM you. Please open a private chat with me first and press the button again."
+        )
 
-async def update_winners_job(ctx:ContextTypes.DEFAULT_TYPE):
-    job=ctx.job;d=job.data
-    if d["c"]>=WINNERS_UPDATE_LIMIT:job.schedule_removal();return
-    d["c"]+=1
+
+async def show_winners_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Kazanan listesi ekranı.
+    Sonrasında JobQueue ile her 15 saniye güncellenir.
+    """
+    query = update.callback_query
+    await query.answer()
+
+    text = build_winners_text()
+    msg = await query.message.reply_text(
+        text=text,
+        parse_mode="Markdown"
+    )
+
+    context.job_queue.run_repeating(
+        update_winners_job,
+        interval=15,
+        first=15,
+        data={
+            "chat_id": msg.chat_id,
+            "message_id": msg.message_id,
+            "counter": 0,
+        }
+    )
+
+
+async def update_winners_job(context: ContextTypes.DEFAULT_TYPE):
+    """
+    Her 15 saniyede fake kazanan listesini günceller.
+    """
+    job = context.job
+    data = job.data
+
+    if data["counter"] >= WINNERS_UPDATE_LIMIT:
+        job.schedule_removal()
+        return
+
+    data["counter"] += 1
+
     try:
-        await ctx.bot.edit_message_text(chat_id=d["chat"],message_id=d["msg"],text=build_winners_text(),parse_mode="Markdown")
-    except:job.schedule_removal()
+        await context.bot.edit_message_text(
+            chat_id=data["chat_id"],
+            message_id=data["message_id"],
+            text=build_winners_text(),
+            parse_mode="Markdown"
+        )
+    except:
+        job.schedule_removal()
 
-async def how_it_works_handler(u,ctx):
-    q=u.callback_query;await q.answer()
-    await q.message.reply_text("3Commas explanation...",parse_mode="Markdown",reply_markup=build_main_keyboard())
+
+async def how_it_works_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Nasıl çalışıyor metni.
+    """
+    query = update.callback_query
+    await query.answer()
+
+    msg = (
+        "ℹ️ *How Does It Work?*\n\n"
+        "3Commas is an automated trading platform that executes trades for you 24/7.\n\n"
+        "✅ Smart strategies\n"
+        "✅ Greed-free entries\n"
+        "✅ Stop-Loss + Take-Profit\n"
+        "✅ Funds safety\n"
+        "✅ No emotions\n\n"
+        f"🎥 Watch the explanation video:\n{HOW_IT_WORKS_VIDEO_URL}\n\n"
+        "Click the button below to claim your **FREE 1-Year Pro account**."
+    )
+
+    await query.message.reply_text(
+        text=msg,
+        parse_mode="Markdown",
+        reply_markup=build_main_keyboard(),
+    )
+
+
+# ================== MAIN ==================
 
 def main():
-    app=ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start",start_handler))
-    app.add_handler(CallbackQueryHandler(get_ref_link_handler,pattern="^get_ref_link$"))
-    app.add_handler(CallbackQueryHandler(show_winners_handler,pattern="^show_winners$"))
-    app.add_handler(CallbackQueryHandler(how_it_works_handler,pattern="^how_it_works$"))
-    app.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND,any_message_handler))
-    app.run_polling()
+    """
+    Botu başlatır (Polling)
+    """
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-if __name__=="__main__":main()
+    app.add_handler(CommandHandler("start", start_handler))
+    app.add_handler(CallbackQueryHandler(get_ref_link_handler, pattern="^get_ref_link$"))
+    app.add_handler(CallbackQueryHandler(show_winners_handler, pattern="^show_winners$"))
+    app.add_handler(CallbackQueryHandler(how_it_works_handler, pattern="^how_it_works$"))
+    app.add_handler(MessageHandler(filters.ALL & (~filters.COMMAND), any_message_handler))
+
+    logger.info("Bot started.")
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
