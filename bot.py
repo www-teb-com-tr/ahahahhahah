@@ -27,7 +27,7 @@ from telegram.ext import (
 # BURAYA YENİ TOKENİNİ KOYACAKSIN
 BOT_TOKEN = "8237912890:AAHo-ynG9m_I38cY1Yny0FmYW-T0wSowPc"
 
-BANNER_URL = "https://hizliresim.com/4zp43r9"   # banner veya GIF
+BANNER_URL = "https://hizliresim.com/4ox06tz"   # banner veya GIF
 
 REF_LINK = "https://3commas.io/?ref=PUT_YOUR_REF_CODE_HERE"   # referral linkin
 
