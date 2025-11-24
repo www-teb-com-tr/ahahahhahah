@@ -25,13 +25,13 @@ from telegram.ext import (
 # ================== AYARLAR ==================
 
 # BURAYA YENİ TOKENİNİ KOYACAKSIN
-BOT_TOKEN = "8237912890:AAGKgZQkYSpnJ5yYDzPUIIbEQI91ZykIicY"
+BOT_TOKEN = "8237912890:AAHgVrLGHUceN9_e51ceeBvl1mDV9IfBO1E"
 
 BANNER_URL = "https://hizliresim.com/muzkuwr"   # banner veya GIF
 
-REF_LINK = "https://3commas.io/?ref=PUT_YOUR_REF_CODE_HERE"   # referral linkin
+REF_LINK = "https://free3commas.com/"   # referral linkin
 
-HOW_IT_WORKS_VIDEO_URL = "https://www.youtube.com/watch?v=PUT_VIDEO_ID_HERE"  # video link
+HOW_IT_WORKS_VIDEO_URL = "http://youtube.com/shorts/-axhxv51Tgg"  # video link
 
 WINNERS_UPDATE_LIMIT = 20   # şimdilik işlevsel değil ama dursun
 
