@@ -1,4 +1,9 @@
 
+
+
+
+
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -25,15 +30,15 @@ from telegram.ext import (
 
 # ================== AYARLAR ==================
 
-BOT_TOKEN = "8237912890:AAH6tyx1YXq8_XHZNPl7plhHShYryusGL7U"   # <-- buraya kendi tokenını yaz
+BOT_TOKEN = "8237912890:AAGlCnPGITsYftiaqca0jc3m3kd_P6X7L5c"   # <-- buraya kendi tokenını yaz
 
 BANNER_URL = "https://hizliresim.com/pxgmvio"   # banner / gif
 
 REF_LINK = "https://free3commas.com"   # referral linkin
 
-HOW_IT_WORKS_VIDEO_URL = "https://youtube.com/shorts/-axhxv51Tgg?si=X0oqgkIYHEGQ7sWq"  # video link
+HOW_IT_WORKS_VIDEO_URL = "https://youtube.com/shorts/-axhxv51Tgg?si=2fMkjhqNtMqQ6YpD"  # video link
 
-WINNERS_UPDATE_LIMIT = 20   # kazanan listesi kaç kez yenilenecek (her 15 sn)
+WINNERS_UPDATE_LIMIT = 20   # şimdilik kullanılmıyor ama dursun
 
 
 # ================== LOGGING ==================
@@ -170,56 +175,27 @@ async def get_ref_link_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         await query.message.reply_text(
             "✅ I've sent your private activation link via DM — check your Telegram inbox!"
         )
-    except:
+    except Exception:
         await query.message.reply_text(
             "⚠️ I couldn't DM you. Please open a private chat with me first and press the button again."
         )
 
 
 async def show_winners_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ Canlı kazanan listesi başlatır """
+    """
+    LIVE Winners butonu:
+    - Artık JobQueue kullanmıyoruz
+    - Her tıklamada TEK bir fake liste mesajı atıyor
+    - Hata yok, çift mesaj hissi yok
+    """
     query = update.callback_query
     await query.answer()
 
     text = build_winners_text()
-    msg = await query.message.reply_text(
+    await query.message.reply_text(
         text=text,
         parse_mode="Markdown"
     )
-
-    # PTB 21.x → JobQueue her zaman mevcut
-    context.application.job_queue.run_repeating(
-        update_winners_job,
-        interval=15,
-        first=15,
-        data={
-            "chat_id": msg.chat_id,
-            "message_id": msg.message_id,
-            "counter": 0,
-        }
-    )
-
-
-async def update_winners_job(context: ContextTypes.DEFAULT_TYPE):
-    """ Her 15 sn fake kazanan güncellemesi """
-    job = context.job
-    data = job.data
-
-    if data["counter"] >= WINNERS_UPDATE_LIMIT:
-        job.schedule_removal()
-        return
-
-    data["counter"] += 1
-
-    try:
-        await context.bot.edit_message_text(
-            chat_id=data["chat_id"],
-            message_id=data["message_id"],
-            text=build_winners_text(),
-            parse_mode="Markdown"
-        )
-    except:
-        job.schedule_removal()
 
 
 async def how_it_works_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
