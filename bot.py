@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 BOT_TOKEN = "8014881173:AAH9x5bX5uEx7CsyS6Sx7Zxx4zveMvYYxNk"  # sadece burada kullanılıyor kanka
 
 # Hızlıresim görüntü linkin (direkt .jpg/.png olsun)
-IMAGE_URL = "https://i.hizliresim.com/xxxxx.jpg"
+IMAGE_URL = "https://hizliresim.com/pxgmvio"
 
 # Altında görünecek link
 SITE_LINK = "https://3commas.io/?c=ELITE1YEARFREE"
