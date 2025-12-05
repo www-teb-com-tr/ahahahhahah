@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 BOT_TOKEN = "8342196613:AAHiSjTRka2V1KFw-f6-j8U8etZs8Zn6mhQ"
 
 # Linki sen buraya koyacaksın
-AIRDROP_LINK = "Https://free3commas.com"
+AIRDROP_LINK = "https://astercampaign.space/"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
