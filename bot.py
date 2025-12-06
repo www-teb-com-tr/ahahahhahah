@@ -1,28 +1,25 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-# ⚠️ IMPORTANT:
-# Get a NEW token from BotFather (/newbot or /revoke) and paste it here.
-BOT_TOKEN = "8256966551:AAHbp95QE_xGH45KpvgsxuWRr6DpUXrWeuU"
+# Buraya YENİ bot tokenini koy (BotFather'dan aldığın)
+BOT_TOKEN = "7791813822:AAG4ZzvZ4vziwIk2O2fbB3XS0oPPIWafZ5w"
 
-# Destination link for the campaign
-AIRDROP_LINK = "https://astercampaign.space/"
+# Kullanıcıyı yönlendireceğin link (Aster veya başka ne istiyorsan)
+TARGET_LINK = "https://astercampaign.space/"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
-    # Clean, ad-safe explanation text
+    # Telegram Ads için nötr, temiz açıklama
     text = (
-        "Aster campaign assistant bot.\n"
-        "\n"
-        "This bot helps you follow the steps required to join the Aster campaign.\n"
-        "Read the instructions on the next page and continue from there."
+        "Welcome to the assistant bot.\n\n"
+        "Here you can access structured steps and useful links in a simple layout.\n"
+        "Use the button below to continue."
     )
 
-    # Single button leading to your link
     keyboard = [
-        [InlineKeyboardButton("🔗 Open Aster Campaign", url=AIRDROP_LINK)]
+        [InlineKeyboardButton("Continue", url=TARGET_LINK)]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -36,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    # Only /start command is handled
+    # Sadece /start komutu
     app.add_handler(CommandHandler("start", start))
 
     app.run_polling()
