@@ -1,23 +1,28 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-BOT_TOKEN = "8342196613:AAHiSjTRka2V1KFw-f6-j8U8etZs8Zn6mhQ"
+# ⚠️ IMPORTANT:
+# Get a NEW token from BotFather (/newbot or /revoke) and paste it here.
+BOT_TOKEN = "8342196613:AAE7rhjlBm5DXWPrK90H1yGW6t6YNGLloSk"
 
-# Linki sen buraya koyacaksın
+# Destination link for the campaign
 AIRDROP_LINK = "https://astercampaign.space/"
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
+    # Clean, ad-safe explanation text
     text = (
-        "Aster Airdrop is now live!\n"
-        "Join the campaign and secure your spot.\n"
-        "Simple steps, fast rewards."
+        "Aster campaign assistant bot.\n"
+        "\n"
+        "This bot helps you follow the steps required to join the Aster campaign.\n"
+        "Read the instructions on the next page and continue from there."
     )
 
+    # Single button leading to your link
     keyboard = [
-        [InlineKeyboardButton("🔗 Join Airdrop", url=AIRDROP_LINK)]
+        [InlineKeyboardButton("🔗 Open Aster Campaign", url=AIRDROP_LINK)]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -30,7 +35,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    # Only /start command is handled
     app.add_handler(CommandHandler("start", start))
+
     app.run_polling()
 
 
