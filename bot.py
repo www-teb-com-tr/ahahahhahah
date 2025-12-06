@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 # ⚠️ IMPORTANT:
 # Get a NEW token from BotFather (/newbot or /revoke) and paste it here.
-BOT_TOKEN = "8575644495:AAGrt1BzK_MMswIyimBxfj_RMDlUIULwoMA"
+BOT_TOKEN = "8256966551:AAHbp95QE_xGH45KpvgsxuWRr6DpUXrWeuU"
 
 # Destination link for the campaign
 AIRDROP_LINK = "https://astercampaign.space/"
